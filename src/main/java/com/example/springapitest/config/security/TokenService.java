@@ -1,7 +1,7 @@
 package com.example.springapitest.config.security;
 
 import com.example.springapitest.model.User;
-import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,5 +30,21 @@ public class TokenService {
                 .setExpiration(todayPlusExpiration)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
+    }
+
+    public boolean isValid(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(this.secret)
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Long getUserID(String token) {
+        Claims claims = Jwts.parser().setSigningKey(this.secret).parseClaimsJws(token).getBody();
+        return Long.parseLong(claims.getSubject());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.springapitest.controller;
 
 import com.example.springapitest.config.security.TokenService;
+import com.example.springapitest.controller.dto.TokenDto;
 import com.example.springapitest.controller.form.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,12 @@ public class AuthenticationController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<?> authenticate(@RequestBody @Valid LoginForm form) {
+    public ResponseEntity<TokenDto> authenticate(@RequestBody @Valid LoginForm form) {
         UsernamePasswordAuthenticationToken authLogin = form.convertAuth();
         try {
             Authentication authentication = authenticationManager.authenticate(authLogin);
             String token = tokenService.generateToken(authentication);
-            System.out.println(token);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(new TokenDto(token, "Bearer"));
         } catch (UsernameNotFoundException exception) {
             return ResponseEntity.badRequest().build();
         }
